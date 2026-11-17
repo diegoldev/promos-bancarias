@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10b981"/>
+      <stop offset="50%" stop-color="#059669"/>
+      <stop offset="100%" stop-color="#0284c7"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="115" fill="url(#bg)"/>
+  <g fill="#ffffff" transform="translate(86, 96)">
+    <path d="M36 24c-11 0-20 9-20 20s9 20 20 20h18l34 146c4 17 19 29 37 29h148c17 0 32-11 36-27l30-112c4-14-7-28-21-28H88l-7-30c-3-11-12-18-23-18H36z" opacity="0.95"/>
+    <circle cx="135" cy="285" r="28"/>
+    <circle cx="265" cy="285" r="28"/>
+    <text x="195" y="178" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-weight="900" font-size="88" fill="#065f46" text-anchor="middle">%</text>
+  </g>
+</svg>

@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>SuperPromos - Descuentos Bancarios</title>
+
+  <!-- iOS Web App Meta Tags -->
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="SuperPromos" />
+  <meta name="theme-color" content="#090d16" />
+
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="icons/icon.svg" />
+  <link rel="icon" type="image/svg+xml" href="icons/icon.svg" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app-container">
+    <!-- Top Header -->
+    <header class="app-header">
+      <div class="header-title-group">
+        <span class="today-badge" id="currentDateLabel">HOY</span>
+        <h1 class="app-title">SuperPromos</h1>
+      </div>
+      <div class="header-actions">
+        <button class="icon-btn" id="btnManageCatalogs" title="Editar Supermercados y Bancos" aria-label="Editar Supermercados y Bancos">
+          🏪
+        </button>
+        <button class="icon-btn" id="btnResetMonth" title="Reiniciar topes del mes" aria-label="Reiniciar topes">
+          🔄
+        </button>
+        <button class="icon-btn" id="btnAddPromo" title="Nueva promoción" aria-label="Agregar promoción">
+          ➕
+        </button>
+      </div>
+    </header>
+
+    <!-- VIEW 1: PROMOS & WIDGET -->
+    <main id="view-promos" class="view-section active">
+      <!-- iOS-style Summary Widget -->
+      <section class="ios-widget-banner" id="todayWidgetSummary">
+        <div class="widget-top-row">
+          <div class="widget-label">
+            <span>⚡</span>
+            <span id="widgetDayTitle">PROMOS DE HOY</span>
+          </div>
+          <div class="widget-savings-pill" id="widgetTotalSaved">Ahorro mes: $0</div>
+        </div>
+        <div class="widget-headline" id="widgetHeadline">Cargando tus promociones...</div>
+        <div class="widget-subtext" id="widgetSubtext">Seleccioná un día o supermercado abajo</div>
+      </section>
+
+      <!-- Day Selector Bar -->
+      <div class="days-scroller" id="daysBar">
+        <!-- Populated by JS -->
+      </div>
+
+      <!-- Supermarket Filter Pills -->
+      <div class="filter-section">
+        <div class="pills-row" id="superFilterRow">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <!-- Bank Filter Pills -->
+      <div class="filter-section">
+        <div class="pills-row" id="bankFilterRow">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <!-- Promos List -->
+      <div class="promos-list" id="promosList">
+        <!-- Populated by JS -->
+      </div>
+    </main>
+
+    <!-- VIEW 2: CALCULATOR -->
+    <section id="view-calc" class="view-section">
+      <div class="calc-card">
+        <h2 style="font-size: 18px; font-weight: 800; margin-bottom: 6px;">Calculadora de Tope y Compra Ideal</h2>
+        <p style="font-size: 12.5px; color: var(--text-secondary); margin-bottom: 16px;">
+          Calculá cuánto te van a reintegrar y hasta cuánto te conviene gastar sin pasarte del tope disponible.
+        </p>
+
+        <div class="form-group">
+          <label class="form-label" for="calcPromoSelect">Elegí la promoción</label>
+          <select id="calcPromoSelect" class="form-select"></select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="calcAmountInput">Monto del ticket a gastar ($)</label>
+          <input type="number" id="calcAmountInput" class="form-input" placeholder="Ej: 40000" inputmode="numeric" />
+        </div>
+
+        <div class="calc-result-box" id="calcResultBox">
+          <div class="calc-row">
+            <span>Descuento promo:</span>
+            <strong id="calcDiscountLabel">0%</strong>
+          </div>
+          <div class="calc-row">
+            <span>Tope restante disponible:</span>
+            <strong id="calcRemainingCap">$0</strong>
+          </div>
+          <div class="calc-row">
+            <span>Compra máxima para aprovechar el 100%:</span>
+            <strong id="calcIdealSpend" style="color: #38bdf8;">$0</strong>
+          </div>
+          <div class="calc-row">
+            <span>Reintegro estimado en esta compra:</span>
+            <strong id="calcEstimatedRefund">$0</strong>
+          </div>
+          <div class="calc-row total">
+            <span>Terminás pagando:</span>
+            <span id="calcFinalPrice">$0</span>
+          </div>
+        </div>
+
+        <button class="btn-primary-full" id="btnRegisterCalcSpend">
+          ✅ Registrar este reintegro en mi tope usado
+        </button>
+      </div>
+    </section>
+
+    <!-- VIEW 3: iPHONE INSTALL & WIDGET GUIDE -->
+    <section id="view-ios" class="view-section">
+      <div class="calc-card">
+        <h2 style="font-size: 18px; font-weight: 800; margin-bottom: 10px;">📲 Cómo instalarla en tu iPhone</h2>
+        <ol style="font-size: 13.5px; color: var(--text-secondary); line-height: 1.6; padding-left: 18px; margin-bottom: 16px;">
+          <li>Abrí esta dirección desde <strong>Safari</strong> en tu iPhone.</li>
+          <li>Tocá el botón <strong>Compartir</strong> (el cuadrado con la flecha hacia arriba en la barra inferior).</li>
+          <li>Elegí <strong>"Agregar a inicio"</strong> (Add to Home Screen).</li>
+          <li>¡Listo! Queda con ícono propio en tu pantalla de inicio y funciona incluso sin internet.</li>
+        </ol>
+
+        <h3 style="font-size: 16px; font-weight: 800; margin-bottom: 8px; color: #34d399;">
+          🧩 Bonus: Widget en la Pantalla de Inicio (Scriptable)
+        </h3>
+        <p style="font-size: 12.5px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 12px;">
+          Si además querés ver un bloque fijo en la pantalla de bloqueo o inicio de iOS sin abrir la app, podés copiar este código para la app gratuita <strong>Scriptable</strong> de la App Store. Se actualiza con tus promos configuradas acá:
+        </p>
+        <button class="btn-primary-full" id="btnCopyScriptable">
+          📋 Copiar código de Widget para Scriptable
+        </button>
+      </div>
+
+      <div class="calc-card">
+        <h3 style="font-size: 16px; font-weight: 800; margin-bottom: 8px;">⚙️ Copia de Seguridad / Restaurar</h3>
+        <p style="font-size: 12.5px; color: var(--text-secondary); margin-bottom: 12px;">
+          Tus promociones, supermercados y topes consumidos se guardan automáticamente en tu iPhone. También podés volver a las promos originales precargadas (con Jumbo, Disco y Vea separados):
+        </p>
+        <button class="btn-danger-full" id="btnRestoreDefaults">
+          Restaurar promociones y supermercados de fábrica
+        </button>
+      </div>
+    </section>
+  </div>
+
+  <!-- Bottom Tab Navigation -->
+  <nav class="bottom-nav">
+    <button class="nav-item active" data-target="view-promos">
+      <span class="nav-icon">🏷️</span>
+      <span>Promos</span>
+    </button>
+    <button class="nav-item" data-target="view-calc">
+      <span class="nav-icon">🧮</span>
+      <span>Calculadora</span>
+    </button>
+    <button class="nav-item" data-target="view-ios">
+      <span class="nav-icon">📱</span>
+      <span>Mi iPhone</span>
+    </button>
+  </nav>
+
+  <!-- Modal: Add / Edit Promo -->
+  <div class="modal-backdrop" id="promoModal">
+    <div class="modal-sheet">
+      <div class="modal-header">
+        <h3 class="modal-title" id="modalTitle">Editar Promoción</h3>
+        <button class="icon-btn" id="btnCloseModal">✕</button>
+      </div>
+      <form id="promoForm">
+        <input type="hidden" id="promoId" />
+
+        <div class="form-group">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <label class="form-label" style="margin-bottom: 0;">Supermercado</label>
+            <button type="button" class="link-action-btn" id="btnQuickEditSupers">⚙️ Editar lista de súpers</button>
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <select id="promoSuper" class="form-select" required></select>
+            <button type="button" class="icon-btn" id="btnQuickAddSuper" title="Nuevo supermercado" style="flex-shrink: 0; width: 44px; height: 44px;">➕</button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <label class="form-label" style="margin-bottom: 0;">Banco / Billetera</label>
+            <button type="button" class="link-action-btn" id="btnQuickEditBanks">⚙️ Editar bancos</button>
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <select id="promoBank" class="form-select" required></select>
+            <button type="button" class="icon-btn" id="btnQuickAddBank" title="Nuevo banco o billetera" style="flex-shrink: 0; width: 44px; height: 44px;">➕</button>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+          <div class="form-group">
+            <label class="form-label">% Descuento</label>
+            <input type="number" id="promoDiscount" class="form-input" placeholder="Ej: 25" required min="1" max="100" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Tope Reintegro ($) (0=Sin tope)</label>
+            <input type="number" id="promoCap" class="form-input" placeholder="Ej: 15000" required min="0" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Período del Tope</label>
+          <select id="promoPeriod" class="form-select">
+            <option value="Semanal">Por Semana</option>
+            <option value="Mensual">Por Mes</option>
+            <option value="Por Día / Transacción">Por Día / Compra</option>
+            <option value="En el acto (Sin tope)">En el acto en línea de cajas</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Días vigentes</label>
+          <div class="days-checkbox-group">
+            <label class="day-check-label"><input type="checkbox" value="1" name="promoDays" /><span>Lun</span></label>
+            <label class="day-check-label"><input type="checkbox" value="2" name="promoDays" /><span>Mar</span></label>
+            <label class="day-check-label"><input type="checkbox" value="3" name="promoDays" /><span>Mié</span></label>
+            <label class="day-check-label"><input type="checkbox" value="4" name="promoDays" /><span>Jue</span></label>
+            <label class="day-check-label"><input type="checkbox" value="5" name="promoDays" /><span>Vie</span></label>
+            <label class="day-check-label"><input type="checkbox" value="6" name="promoDays" /><span>Sáb</span></label>
+            <label class="day-check-label"><input type="checkbox" value="0" name="promoDays" /><span>Dom</span></label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Título / Condición (ej. Tarjeta Crédito Visa / QR)</label>
+          <input type="text" id="promoTitle" class="form-input" placeholder="Ej: Pagando con QR MODO tarjetas Visa/Master" required />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Notas extra (Acumulable, exclusiones, etc.)</label>
+          <input type="text" id="promoNotes" class="form-input" placeholder="Ej: Acumula con promociones del súper" />
+        </div>
+
+        <button type="submit" class="btn-primary-full">Guardar Promoción</button>
+        <button type="button" class="btn-danger-full" id="btnDeletePromo" style="display: none;">Eliminar Promoción</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Manage Supermarkets & Banks -->
+  <div class="modal-backdrop" id="catalogModal">
+    <div class="modal-sheet">
+      <div class="modal-header">
+        <h3 class="modal-title">🏪 Editar Supermercados y Bancos</h3>
+        <button class="icon-btn" id="btnCloseCatalogModal">✕</button>
+      </div>
+
+      <!-- Supermarkets Manager -->
+      <div class="form-group">
+        <label class="form-label">Supermercados (podés agregar, renombrar o borrar)</label>
+        <div style="display: flex; gap: 8px; margin-bottom: 10px;">
+          <input type="text" id="newSuperInput" class="form-input" placeholder="Nuevo súper (ej: ChangoMās, Makro...)" />
+          <button type="button" class="btn-small primary" id="btnAddSuperCatalog" style="padding: 0 14px; font-size: 13px;">Agregar</button>
+        </div>
+        <div id="superCatalogList" class="catalog-list"></div>
+      </div>
+
+      <hr style="border: none; border-top: 1px solid var(--border-subtle); margin: 18px 0;" />
+
+      <!-- Banks Manager -->
+      <div class="form-group">
+        <label class="form-label">Bancos / Billeteras / Fidelidad</label>
+        <div style="display: flex; gap: 8px; margin-bottom: 10px;">
+          <input type="text" id="newBankInput" class="form-input" placeholder="Nuevo banco (ej: Galicia, BBVA, Jumbo+)" />
+          <button type="button" class="btn-small primary" id="btnAddBankCatalog" style="padding: 0 14px; font-size: 13px;">Agregar</button>
+        </div>
+        <div id="bankCatalogList" class="catalog-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Quick Log Tope Used -->
+  <div class="modal-backdrop" id="spendModal">
+    <div class="modal-sheet">
+      <div class="modal-header">
+        <h3 class="modal-title" id="spendModalTitle">Registrar Compra</h3>
+        <button class="icon-btn" id="btnCloseSpendModal">✕</button>
+      </div>
+      <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 14px;" id="spendModalDesc"></p>
+      <input type="hidden" id="spendPromoId" />
+      <div class="form-group">
+        <label class="form-label">¿Cuánto gastaste en el ticket? ($)</label>
+        <input type="number" id="spendTicketAmount" class="form-input" placeholder="Ej: 35000" inputmode="numeric" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">O ingresá directo el reintegro usado ($)</label>
+        <input type="number" id="spendRefundAmount" class="form-input" placeholder="Ej: 10000" inputmode="numeric" />
+      </div>
+      <button type="button" class="btn-primary-full" id="btnConfirmSpend">Sumar al tope consumido</button>
+      <button type="button" class="btn-danger-full" id="btnResetSingleSpend">Reiniciar tope de esta promo a $0</button>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
