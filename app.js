@@ -122,6 +122,7 @@ const DEFAULT_PROMOS = [
     bank: 'Cuenta DNI',
     discount: 20,
     cap: 8000,
+    minSpend: 20000,
     period: 'Semanal',
     days: [1, 2], // Lunes y Martes
     title: 'Pagando con QR Cuenta DNI en tiendas Día',
@@ -182,6 +183,7 @@ const DEFAULT_PROMOS = [
     bank: 'Mercado Pago',
     discount: 15,
     cap: 5000,
+    minSpend: 15000,
     period: 'Semanal',
     days: [3], // Miércoles
     title: 'QR Mercado Pago (compra mínima $15.000)',
@@ -491,6 +493,8 @@ function renderPromosList() {
   listEl.innerHTML = filtered.map(p => {
     const color = BANK_COLORS[p.bank] || '#10b981';
     const hasCap = p.cap && p.cap > 0;
+    const minSpend = Number(p.minSpend) || 0;
+    const hasMinSpend = minSpend > 0;
     const used = Number(p.usedCap) || 0;
     const remaining = hasCap ? Math.max(0, p.cap - used) : 0;
     const idealSpend = getIdealMaxSpend(p);
@@ -522,6 +526,12 @@ function renderPromosList() {
             <span class="meta-label">Tope Disp.</span>
             <span class="meta-val" style="color: ${hasCap && remaining === 0 ? '#ef4444' : '#34d399'}">
               ${hasCap ? formatARS(remaining) : 'Ilimitado'}
+            </span>
+          </div>
+          <div class="meta-box">
+            <span class="meta-label">Mín. de Compra</span>
+            <span class="meta-val" style="color: ${hasMinSpend ? '#fbbf24' : 'var(--text-primary)'}">
+              ${hasMinSpend ? formatARS(minSpend) : 'Sin mínimo'}
             </span>
           </div>
           <div class="meta-box">
@@ -586,18 +596,31 @@ function updateCalculatorValues() {
 
   const ticket = Number(amountInput.value) || 0;
   const hasCap = promo.cap && promo.cap > 0;
+  const minSpend = Number(promo.minSpend) || 0;
   const remainingCap = hasCap ? Math.max(0, promo.cap - (promo.usedCap || 0)) : Infinity;
   const idealSpend = hasCap ? Math.round((remainingCap / promo.discount) * 100) : null;
 
-  const rawRefund = (ticket * promo.discount) / 100;
+  const belowMin = minSpend > 0 && ticket > 0 && ticket < minSpend;
+  const rawRefund = belowMin ? 0 : (ticket * promo.discount) / 100;
   const actualRefund = hasCap ? Math.min(rawRefund, remainingCap) : rawRefund;
   const finalPrice = Math.max(0, ticket - actualRefund);
 
   document.getElementById('calcDiscountLabel').textContent = `${promo.discount}% (${promo.period})`;
+  document.getElementById('calcMinSpendLabel').textContent = minSpend > 0 ? formatARS(minSpend) : 'Sin mínimo';
   document.getElementById('calcRemainingCap').textContent = hasCap ? formatARS(remainingCap) : 'Sin tope';
   document.getElementById('calcIdealSpend').textContent = hasCap ? formatARS(idealSpend) : 'Sin límite';
   document.getElementById('calcEstimatedRefund').textContent = formatARS(actualRefund);
   document.getElementById('calcFinalPrice').textContent = formatARS(finalPrice);
+
+  const warnEl = document.getElementById('calcMinSpendWarning');
+  if (warnEl) {
+    if (belowMin) {
+      warnEl.style.display = 'flex';
+      warnEl.innerHTML = `<span>⚠️ Te faltan ${formatARS(minSpend - ticket)} para llegar al mínimo de ${formatARS(minSpend)}</span>`;
+    } else {
+      warnEl.style.display = 'none';
+    }
+  }
 }
 
 // Modals: Edit / Add Promo
@@ -615,6 +638,7 @@ function openEditModal(promoId = null) {
     document.getElementById('promoId').value = p.id;
     document.getElementById('promoDiscount').value = p.discount;
     document.getElementById('promoCap').value = p.cap;
+    document.getElementById('promoMinSpend').value = p.minSpend || 0;
     document.getElementById('promoPeriod').value = p.period;
     document.getElementById('promoTitle').value = p.title;
     document.getElementById('promoNotes').value = p.notes || '';
@@ -629,6 +653,7 @@ function openEditModal(promoId = null) {
     populatePromoFormSelects(defaultSuper, defaultBank);
     document.getElementById('modalTitle').textContent = 'Nueva Promoción';
     document.getElementById('promoId').value = '';
+    document.getElementById('promoMinSpend').value = 0;
     deleteBtn.style.display = 'none';
   }
 
@@ -921,6 +946,7 @@ document.addEventListener('DOMContentLoaded', () => {
       bank: document.getElementById('promoBank').value,
       discount: Number(document.getElementById('promoDiscount').value),
       cap: Number(document.getElementById('promoCap').value) || 0,
+      minSpend: Number(document.getElementById('promoMinSpend').value) || 0,
       period: document.getElementById('promoPeriod').value,
       days,
       title: document.getElementById('promoTitle').value.trim(),
@@ -958,6 +984,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const p = state.promos.find(item => item.id === id);
     if (!p) return;
     const ticket = Number(e.target.value) || 0;
+    const minSpend = Number(p.minSpend) || 0;
+    if (minSpend > 0 && ticket > 0 && ticket < minSpend) {
+      document.getElementById('spendRefundAmount').value = 0;
+      return;
+    }
     const remaining = Math.max(0, p.cap - (p.usedCap || 0));
     const estRefund = Math.min(remaining, Math.round((ticket * p.discount) / 100));
     document.getElementById('spendRefundAmount').value = estRefund > 0 ? estRefund : '';

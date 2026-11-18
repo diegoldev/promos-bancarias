@@ -1,4 +1,4 @@
-const CACHE_NAME = 'super-promos-v3';
+const CACHE_NAME = 'super-promos-v4';
 const ASSETS = [
   './',
   './index.html',
